@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRISSAMA Lex</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #f4f6f7;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #003300;
+            color: #ffffff;
+            padding: 2em;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Container */
+        .container {
+            flex: 1;
+            width: 90%;
+            max-width: 1200px;
+            margin: 2em auto;
+            background-color: #ffffff;
+            padding: 2em;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+        }
+
+        /* Search Bar */
+        .search-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2em;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            max-width: 600px;
+            padding: 0.75em 1em;
+            font-size: 1.1em;
+            border: 2px solid #ced4da;
+            border-radius: 25px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .search-bar input:focus {
+            border-color: #006400;
+            box-shadow: 0 0 8px rgba(0, 100, 0, 0.3);
+            outline: none;
+        }
+
+        /* Suggestions */
+        .suggestions-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            border: 1px solid #ced4da;
+            border-radius: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .suggestions-list li {
+            padding: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .suggestions-list li:hover {
+            background-color: #f1f3f5;
+        }
+
+        /* Filters */
+        .filter-section {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 2em;
+        }
+
+        .filter-section select,
+        .filter-section button {
+            flex: 1;
+            max-width: 23%;
+            padding: 0.75em;
+            margin: 0.5em 0;
+            border: 2px solid #ced4da;
+            border-radius: 10px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            font-size: 1em;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        .filter-section button {
+            background-color: #006400;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .filter-section button:hover {
+            background-color: #004d00;
+        }
+
+        select:focus,
+        button:focus {
+            border-color: #006400;
+            box-shadow: 0 0 8px rgba(0, 100, 0, 0.3);
+            outline: none;
+        }
+
+        /* Results */
+        .results {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 2em;
+        }
+
+        .results table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5em;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .results th,
+        .results td {
+            padding: 1em;
+            text-align: left;
+            border: 1px solid #dee2e6;
+        }
+
+        .results th {
+            background-color: #003300;
+            color: #ffffff;
+            position: sticky;
+            top: 0;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.05em;
+        }
+
+        .results td {
+            background-color: #ffffff;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .results tr:hover td {
+            background-color: #f1f3f5;
+        }
+
+        .results a {
+            color: #006400;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .results a:hover {
+            color: #004d00;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 1.5em;
+        }
+
+        .pagination button {
+            background-color: #006400;
+            color: #ffffff;
+            border: none;
+            padding: 0.75em 1.5em;
+            margin: 0 0.25em;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .pagination button:hover {
+            background-color: #004d00;
+        }
+
+        .pagination button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #003300;
+            color: #ffffff;
+            padding: 2em 0;
+            text-align: center;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 1.1em;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 600px) {
+            .search-bar input {
+                width: calc(100% - 2em);
+                margin: 0 auto;
+            }
+
+            .filter-section select,
+            .filter-section button {
+                max-width: 100%;
+                margin: 0.5em 0;
+            }
+
+            .results th,
+            .results td {
+                padding: 0.75em;
+            }
+
+            .pagination button {
+                padding: 0.5em 1em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>TRISSAMA Lex</h1>
+    </header>
+
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" id="search" placeholder="Rechercher un texte, statut, ou source...">
+            <ul id="suggestions" class="suggestions-list"></ul>
+        </div>
+
+        <div class="filter-section">
+            <select id="type-filter">
+                <option value="">Tous les types de texte</option>
+                <option value="Loi">Loi</option>
+                <option value="Décret">Décret</option>
+                <option value="Ordonnance">Ordonnance</option>
+                <option value="Arrêté">Arrêté</option>
+                <option value="Règlement">Règlement</option>
+            </select>
+            <select id="domain-filter">
+                <option value="">Tous les domaines d'application</option>
+                <option value="GESTION DES RESSOURCES HUMAINES ET SOCIALES">GESTION DES RESSOURCES HUMAINES ET SOCIALES</option>
+                <option value="CONSOMMATION">CONSOMMATION</option>
+                <option value="CONCURRENCE">CONCURRENCE</option>
+                <option value="DOUANES">DOUANES</option>
+            </select>
+            <select id="source-filter">
+                <option value="">Toutes les réglementations</option>
+                <option value="Nationale">Nationale</option>
+                <option value="Internationale">Internationale</option>
+            </select>
+            <select id="en-vigueur-filter">
+                <option value="">En Vigueur</option>
+                <option value="Oui">Oui</option>
+                <option value="Non">Non</option>
+            </select>
+            <button id="clear-filters">Réinitialiser les filtres</button>
+        </div>
+
+        <div class="results">
+            <table id="results-table">
+                <thead>
+                    <tr>
+                        <th>Titre</th>
+                        <th>Type</th>
+                        <th>Domaine</th>
+                        <th>Source</th>
+                        <th>En Vigueur</th>
+                        <th>pdf</th>
+                    </tr>
+                </thead>
+                <tbody id="results-body">
+                    <!-- Dynamically filled rows go here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination">
+            <button id="prev-button" disabled>Précédent</button>
+            <span id="current-page">Page 1</span>
+            <button id="next-button">Suivant</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 TRISSAMA - Tous droits réservés</p>
+    </footer>
+
+    <script>
+        // Data
+        const allResults = [
+        { titre: "Loi sur la consommation", type: "Loi", domaine: "CONSOMMATION", source: "Nationale", enVigueur: "Oui", link: "docA.pdf" },
+            { titre: "Décret sur la concurrence", type: "Décret", domaine: "CONCURRENCE", source: "Nationale", enVigueur: "Non", link: "docB.pdf" },
+            { titre: "Ordonnance douanière", type: "Ordonnance", domaine: "DOUANES", source: "Internationale", enVigueur: "Oui", link: "docC.pdf" },
+            { titre: "Règlement des ressources humaines", type: "Règlement", domaine: "GESTION DES RESSOURCES HUMAINES ET SOCIALES", source: "Internationale", enVigueur: "Oui", link: "docD.pdf" },
+            { titre: "Arrêté sur la concurrence", type: "Arrêté", domaine: "CONCURRENCE", source: "Nationale", enVigueur: "Non", link: "docE.pdf" },
+            // Add more sample data here
+        ];
+
+        let filteredResults = [...allResults];
+        let currentPage = 1;
+        const resultsPerPage = 3;
+
+        // DOM Elements
+        const searchInput = document.getElementById('search');
+        const suggestionsList = document.getElementById('suggestions');
+        const typeFilter = document.getElementById('type-filter');
+        const domainFilter = document.getElementById('domain-filter');
+        const sourceFilter = document.getElementById('source-filter');
+        const enVigueurFilter = document.getElementById('en-vigueur-filter');
+        const clearFiltersBtn = document.getElementById('clear-filters');
+        const resultsBody = document.getElementById('results-body');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const currentPageSpan = document.getElementById('current-page');
+
+        // Pagination
+        function paginateResults() {
+            const startIndex = (currentPage - 1) * resultsPerPage;
+            const endIndex = startIndex + resultsPerPage;
+            const paginatedResults = filteredResults.slice(startIndex, endIndex);
+
+            resultsBody.innerHTML = '';
+
+            paginatedResults.forEach(result => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${result.titre}</td><td>${result.type}</td><td>${result.domaine}</td><td>${result.source}</td><td>${result.enVigueur}</td><td><a href="${result.link}">Télécharger</a></td>`;
+                resultsBody.appendChild(row);
+            });
+
+            prevButton.disabled = currentPage === 1;
+            nextButton.disabled = endIndex >= filteredResults.length;
+            currentPageSpan.textContent = `Page ${currentPage}`;
+        }
+
+        // Apply Filters
+        function applyFilters() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const type = typeFilter.value;
+            const domaine = domainFilter.value;
+            const source = sourceFilter.value;
+            const enVigueur = enVigueurFilter.value;
+
+            filteredResults = allResults.filter(result => {
+                return (
+                    result.titre.toLowerCase().includes(searchTerm) &&
+                    (type === '' || result.type === type) &&
+                    (domaine === '' || result.domaine === domaine) &&
+                    (source === '' || result.source === source) &&
+                    (enVigueur === '' || result.enVigueur === enVigueur)
+                );
+            });
+
+            currentPage = 1;
+            paginateResults();
+        }
+
+        // Event Listeners for Filters
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            const suggestions = allResults
+                .filter(result => result.titre.toLowerCase().includes(searchTerm))
+                .map(result => result.titre)
+                .slice(0, 5);
+
+            suggestionsList.innerHTML = '';
+
+            suggestions.forEach(suggestion => {
+                const li = document.createElement('li');
+                li.textContent = suggestion;
+                li.addEventListener('click', () => {
+                    searchInput.value = suggestion;
+                    suggestionsList.innerHTML = '';
+                    applyFilters();
+                });
+                suggestionsList.appendChild(li);
+            });
+
+            applyFilters();
+        });
+
+        typeFilter.addEventListener('change', applyFilters);
+        domainFilter.addEventListener('change', applyFilters);
+        sourceFilter.addEventListener('change', applyFilters);
+        enVigueurFilter.addEventListener('change', applyFilters);
+
+        clearFiltersBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            typeFilter.value = '';
+            domainFilter.value = '';
+            sourceFilter.value = '';
+            enVigueurFilter.value = '';
+            applyFilters();
+        });
+
+        // Pagination Event Listeners
+        prevButton.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                paginateResults();
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (currentPage * resultsPerPage < filteredResults.length) {
+                currentPage++;
+                paginateResults();
+            }
+        });
+
+        // Initial Load
+        paginateResults();
+    </script>
+</body>
+
+</html>
